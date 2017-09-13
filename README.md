@@ -1,6 +1,6 @@
 <h1 align="center"><strong>Welcome to Batch-101</strong></h1>
 
-### About - Simple Shredder
+## About - Simple Shredder
 
 This small batch file, leverages the power of SDelete in order to shred files or folders dragged and dropped onto the Simple Shedder icon.
 
@@ -25,4 +25,24 @@ Just drag and drop Files or Folders and their contents onto the Simple Shredder 
 
 The Icon provided is a design by [Mateusz Dembek](https://dribbble.com/shots/582476-Mail-icons-pack)
 
-[![Simple Shredder GPLv2+](https://img.shields.io/badge/%20%20Simple_Shredder%20%20-%20GPLv2+%20-blue.svg)](LICENCE)
+[![Simple Shredder GPLv2+](https://img.shields.io/badge/%20%20%20Simple_Shredder%20%20%20-%20GPLv2+%20-blue.svg)](LICENCE)  
+
+---
+
+## About - Simple Password Generator
+
+This small batch file, generates complex passwords from a preset range lenght of 10 to 30 characters long or from a custom user defined lenght.
+
+It allows you to save your password to a text file which is stored to wherever path the batch file is, along with a reference tied to the password for you to at any time access.
+
+If this path is a USB drive your passwords will be safe as long as you take simple precautions.
+
+#### How Strong Are My Passwords
+
+You can find out how strong your passwords are [here](https://www.grc.com/haystack.htm)
+
+![Simple Password Generator](./screenshots/Simple-Password-Generator.PNG "Main Menu")
+
+:warning: **Warning** The Simple Password Generator **empties your clipboard** on every password regeneration or when it exits.
+
+[![Simple Password Generator GPLv2+](https://img.shields.io/badge/%20%20%20%20%20%20Simple_Password_Generator%20%20%20%20%20%20-%20GPLv2+%20-blue.svg)](LICENCE)
