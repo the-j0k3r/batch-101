@@ -1,11 +1,13 @@
 @ECHO OFF
+REM UNCOMMENT FOR DEBUG
+::IF NOT DEFINED in_subprocess (CMD /K SET in_subprocess=y ^& %0 %*) & EXIT )
 SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 SET Parent=%~dp0
 SET Self=%~n0
 SET Sprompt=%Self% ^$
 SET Sprompt1=%Self% $
 SET SDsource=https://live.sysinternals.com/Files/SDelete.zip
-SET Ver=v1.70
+SET Ver=v1.71
 REM Add title and set size ;)
 TITLE %Self%
 MODE CON: COLS=95 LINES=30
@@ -107,7 +109,7 @@ ECHO  :                                                                         
 ECHO  :  2) Listing of items dropped only happens after selection the number of passes and in     :
 ECHO  :     accordance to limitation #1.                                                          :
 ECHO  :                                                                                           :
-ECHO  :  3) You must drag and drop files or folders onto Shredder Icon to be processed, if not    :
+ECHO  :  3) You must drag & drop files or folders onto Shredder Icon to be processed, if not      :
 ECHO  :     there is no way to determine if items were dropped after you clicked the Shredder     :
 ECHO  :     Icon, so only the licence is shown.                                                   :
 ECHO  :                                                                                           :
@@ -121,8 +123,6 @@ ECHO %Sprompt%: PRESS "N" KEY TO EXIT.
 SET /P RtMM="%Sprompt1%: Return to Main Menu [Y/N]? "
 IF /I "%RtMM%" EQU "Y" GOTO :MENU
 IF /I "%RtMM%" EQU "N" GOTO :EXIT
-::IF /I "%RtMM%"=="%RtMM%" GOTO :ERROR
-::ERROR
 ECHO %Sprompt1%: ERROR: Not a valid option. Valid options are [Y/N], try again^^!
 GOTO :RTMMQ
 
@@ -142,36 +142,37 @@ ECHO  :                                   [2] 3 Secure DoD Passes               
 ECHO  :                                   [3] 4 Secure DoD Passes                                 :
 ECHO  :                                   [4] 5 Secure DoD Passes                                 :
 ECHO  :                                   [5] 6 Secure DoD Passes                                 :
+ECHO  :                                   [6] 7 Custom DoD Passes                                 :
 ECHO  :                                                                                           :
-ECHO  :                                   [6] Help and FAQ                                        :
-ECHO  :                                   [7] EXIT                                                :
+ECHO  :                                   [7] Help and FAQ                                        :
+ECHO  :                                   [8] EXIT                                                :
 ECHO  :                                                                                           :
 ECHO  +-------------------------------------------------------------------------------------------+
 ECHO.
-CHOICE /C 1234567 /M "%Sprompt1%: Select the number of secure passes to use: "
+CHOICE /C 12345678 /M "%Sprompt1%: Select the your desired option above: "
 IF %ERRORLEVEL%==1 SET Passes=2
 IF %ERRORLEVEL%==2 SET Passes=3
 IF %ERRORLEVEL%==3 SET Passes=4
 IF %ERRORLEVEL%==4 SET Passes=5
 IF %ERRORLEVEL%==5 SET Passes=6
-IF %ERRORLEVEL%==6 GOTO :HELP
-IF %ERRORLEVEL%==7 GOTO :EXIT
+IF %ERRORLEVEL%==6 GOTO :CUSTOM
+IF %ERRORLEVEL%==7 GOTO :HELP
+IF %ERRORLEVEL%==8 GOTO :EXIT
+:CONTINUE
 ECHO %Sprompt%: INFO: %Passes% passes are set to securely delete the items queued.
 ECHO %Sprompt%: INFO: %Self% has loaded SDelete %OS_ARCH%.
 ECHO.
 
+:LIST
 SET "arg=%*"
 SET "arg=%arg:)=^)%"
 SET "arg=%arg:(=^(%"
-
-:LIST
 REM We cant reliably list in detail e.g multiple directories via drag and drop.
 REM Because of this batch limitation only the selected and first dropped item is listed in detail.
 REM Look into loading items dynamically by browsing for them and queuing them instead.
 ECHO  +-----------------------+ BEGIN LISTING ITEMS QUEUED FOR DELETION +-------------------------+
 ECHO.
-FOR /F "tokens=1,2 delims=d" %%b IN ("-%~a1") DO (
-	IF "%%c" NEQ "" (
+FOR /F "tokens=1,2 delims=d" %%b IN ("-%~a1") DO IF "%%c" NEQ "" (
 		FOR /R "%~f1" %%d IN (*) DO (
 			ECHO %Sprompt%: %%d
 		)
@@ -233,6 +234,21 @@ ECHO %KthX%
 ECHO %ExiT% . . .
 PING 1.0.0.0 -n 1 -w 100 >NUL
 EXIT
+
+:CUSTOM
+SET "CustomLenQ="""
+SET /P CustomLenQ="%Sprompt%: Enter your custom DoD pass length: "
+SET /A EvalCLen=CustomLenQ
+IF %EvalCLen% EQU %CustomLenQ% (
+	IF %CustomLenQ% GTR 99 ( GOTO :INVALID )
+	IF %CustomLenQ% GTR 6 ( SET "Passes=%CustomLenQ%" & GOTO :CONTINUE )
+	IF %CustomLenQ% LSS 5 ( GOTO :INVALID )
+) ELSE ( GOTO :INVALID )
+
+:INVALID
+ECHO %Sprompt%: ERROR: Input is invalid.
+ECHO %Sprompt%: INFO : Enter a number greater than 6 and smaller than 100.
+GOTO :CUSTOM
 
 :UNSUP
 COLOR 0B
