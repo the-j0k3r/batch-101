@@ -14,7 +14,7 @@ Just drag and drop Files or Folders and their contents onto the Simple Shredder 
 
 ### Instructions
 
-* Download SDelete from ![here](https://live.sysinternals.com/Files/SDelete.zip "SDelete 32-bit/64-bit")
+* Download SDelete from [here](https://live.sysinternals.com/Files/SDelete.zip "SDelete 32-bit/64-bit")
 * Extract the SDelete binaries into the Simple Shredder directory.
 * Drag and Drop files or folders onto the Simple Shredder.bat
 
@@ -23,6 +23,6 @@ Just drag and drop Files or Folders and their contents onto the Simple Shredder 
 * You can also create a shortcut to the ```Simple Shredder.bat``` and assign the icon provided to the shortcut.  
   Dragging and Dropping items onto the shortcut works the same way.
 
-The Icon provided is a design by ![Mateusz Dembek](https://dribbble.com/shots/582476-Mail-icons-pack)
+The Icon provided is a design by [Mateusz Dembek](https://dribbble.com/shots/582476-Mail-icons-pack)
 
 [![Simple Shredder GPLv2+](https://img.shields.io/badge/%20%20Simple_Shredder%20%20-%20GPLv2+%20-blue.svg)](LICENCE)
