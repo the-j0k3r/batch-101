@@ -10,7 +10,7 @@ SET SDsource=https://live.sysinternals.com/Files/SDelete.zip
 SET Ver=v1.71
 REM Add title and set size ;)
 TITLE %Self%
-MODE CON: COLS=95 LINES=30
+MODE CON: COLS=95 LINES=33
 
 CD /D "%Parent%"
 
