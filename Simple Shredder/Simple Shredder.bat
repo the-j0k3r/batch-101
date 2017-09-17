@@ -7,7 +7,7 @@ SET Self=%~n0
 SET Sprompt=%Self% ^$
 SET Sprompt1=%Self% $
 SET SDsource=https://live.sysinternals.com/Files/SDelete.zip
-SET Ver=v1.71
+SET Ver=v1.72
 REM Add title and set size ;)
 TITLE %Self%
 MODE CON: COLS=95 LINES=33
@@ -142,7 +142,7 @@ ECHO  :                                   [2] 3 Secure DoD Passes               
 ECHO  :                                   [3] 4 Secure DoD Passes                                 :
 ECHO  :                                   [4] 5 Secure DoD Passes                                 :
 ECHO  :                                   [5] 6 Secure DoD Passes                                 :
-ECHO  :                                   [6] 7 Custom DoD Passes                                 :
+ECHO  :                                   [6] x Custom DoD Passes                                 :
 ECHO  :                                                                                           :
 ECHO  :                                   [7] Help and FAQ                                        :
 ECHO  :                                   [8] EXIT                                                :

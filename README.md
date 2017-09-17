@@ -4,11 +4,14 @@
 
 This small batch file, leverages the power of SDelete in order to shred files or folders dragged and dropped onto the Simple Shedder icon.
 
-Simple Shredder is menu driven and offers a few options, at this time, it allows the user to decide between 2 to 6 passes that SDelete will use to shred your files into oblivion, likely for all time :).
+Simple Shredder is menu driven and offers a few options, at this time, it allows the user to decide between 2 to 6 or a custom number of passes that SDelete will use to shred your files into oblivion, likely for all time :).
 
 Once you download and extract the SDelete binaries into the Simple Shredder directory, you're set to go. Simple Shredder automatically uses the correct SDelete binary bitness 32-bit/64-bit which is system dependant.
 
-Just drag and drop Files or Folders and their contents onto the Simple Shredder icon to begin. Simple
+Just drag and drop Files or Folders and their contents onto the Simple Shredder icon to begin. Simple!
+
+SDelete is developed by Mark Russinovich ans is part of sysinternals suite.  
+Information about SDelete can be found [here](https://docs.microsoft.com/en-us/sysinternals/downloads/sdelete)
 
 ![Simple Shredder](./screenshots/Simple-Shredder.PNG "Main Menu")
 
