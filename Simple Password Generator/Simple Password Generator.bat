@@ -18,7 +18,7 @@ ECHO  :                                [2] 15 Random Characters Long            
 ECHO  :                                [3] 20 Random Characters Long                              :
 ECHO  :                                [4] 25 Random Characters Long                              :
 ECHO  :                                [5] 30 Random Characters Long                              :
-ECHO  :                                [6] Custom Random Lenght                                   :
+ECHO  :                                [6] Custom Random Length                                   :
 ECHO  :                                                                                           :
 ECHO  :                                [7] ABOUT                                                  :
 ECHO  :                                [8] EXIT                                                   :
@@ -92,7 +92,7 @@ CALL:HEADER
 ECHO  :                                                                                           :
 ECHO  :            The original random char generator (:PGEN) was provided by TheOutcaste.        :
 ECHO  :            The Simple Password Generator is a batch script that builds upon that          :
-ECHO  :            to generate user selectable lenghts passwords and save them to file.           :
+ECHO  :            to generate user selectable lengths passwords and save them to file.           :
 ECHO  :                                                                                           :
 ECHO  :            Copyright (C) 2017 the-j0k3r <th3-j0ker at protonmail dot com>                 :
 ECHO  :            Copyright :PGEN (C) 2009 <http://tinyurl.com/TheOutcaste>                      :
@@ -120,7 +120,7 @@ SET /P Return2MMQ="SPG $: Return to Main Menu [Y/N]? "
 IF /I "%Return2MMQ%" EQU "Y" CLS && GOTO :MAIN
 IF /I "%Return2MMQ%" EQU "N" GOTO :EXIT
 IF /I "%Return2MMQ%"=="%Return2MMQ%" GOTO :INFO2
-GOtO :ABOUT
+GOTO :ABOUT
 
 :INFO2
 ECHO %SPGprompt%: ERROR: Not a valid option. Valid options are [Y/N], try again^!
