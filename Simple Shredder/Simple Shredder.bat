@@ -7,7 +7,7 @@ SET Self=%~n0
 SET Sprompt=%Self% ^$
 SET Sprompt1=%Self% $
 SET SDsource=https://live.sysinternals.com/Files/SDelete.zip
-SET Ver=v1.72
+SET Ver=v1.74
 REM Add title and set size ;)
 TITLE %Self%
 MODE CON: COLS=95 LINES=33
@@ -113,8 +113,6 @@ ECHO  :  3) You must drag & drop files or folders onto Shredder Icon to be proce
 ECHO  :     there is no way to determine if items were dropped after you clicked the Shredder     :
 ECHO  :     Icon, so only the licence is shown.                                                   :
 ECHO  :                                                                                           :
-ECHO  :  4) Single drop empty Directories are not listed, but are deleted none-the-less.          :
-ECHO  :                                                                                           :
 ECHO  +-------------------------------------------------------------------------------------------+
 ECHO.
 
@@ -172,6 +170,12 @@ REM Because of this batch limitation only the selected and first dropped item is
 REM Look into loading items dynamically by browsing for them and queuing them instead.
 ECHO  +-----------------------+ BEGIN LISTING ITEMS QUEUED FOR DELETION +-------------------------+
 ECHO.
+:: List Empty directories too.
+FOR /D /R %1 %%A in (.) DO (
+  DIR /a /b "%%~fA" 2>NUL | FINDSTR "^" >NUL || ECHO %Sprompt%: %%~fA
+)
+:: Recursive directory listing of contents.
+:: Also handle dropped files listing.
 FOR /F "tokens=1,2 delims=d" %%b IN ("-%~a1") DO IF "%%c" NEQ "" (
 		FOR /R "%~f1" %%d IN (*) DO (
 			ECHO %Sprompt%: %%d
