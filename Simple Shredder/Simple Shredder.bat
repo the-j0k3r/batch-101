@@ -7,10 +7,10 @@ SET Self=%~n0
 SET Sprompt=%Self% ^$
 SET Sprompt1=%Self% $
 SET SDsource=https://live.sysinternals.com/Files/SDelete.zip
-SET Ver=v1.74
+SET Ver=v1.79
 REM Add title and set size ;)
 TITLE %Self%
-MODE CON: COLS=95 LINES=33
+MODE CON: COLS=95 LINES=35
 
 CD /D "%Parent%"
 
@@ -35,22 +35,20 @@ IF NOT EXIST %SDelete% (
 	COLOR 4E
 	CALL :HEADER
 	ECHO.
-	ECHO %Sprompt%: The %SDelete% binary was NOT found in parent directory.
-	ECHO %Sprompt%: Download SDelete from %SDsource%
-	ECHO %Sprompt%: Extract the SDelete.zip in %Parent%
-	ECHO %Sprompt%: PRESS ANY KEY TO CONTINUE.
+	ECHO %Sprompt%: ERROR: The %SDelete% binary was NOT found in parent directory.
+	ECHO.
+	ECHO %Sprompt%: INFO: Download SDelete from %SDsource%
+	ECHO %Sprompt%: INFO: Extract the SDelete.zip in %Parent%
+	ECHO %Sprompt%: INFO: Drop Files / Folders to be deleted onto the %Self% Icon.
+	ECHO %Sprompt%: PRESS ANY KEY TO EXIT.
 	PAUSE >NUL
-	GOTO :HASFILE
+	GOTO :EXIT
 ) ELSE (
 	IF EXIST %SDelete% (
-		COLOR A
-		CALL :HEADER
-		ECHO.
-		ECHO %Sprompt%: The %SDelete% binary WAS found in %Parent%
-		::PING 1.0.0.0 -n 1 -w 300 >NUL
 		GOTO :HASFILE
 	)
 )
+
 :HASFILE
 REM Check if user clicked on icon or dropped a file.
 IF EXIST "%~1" ( 2>NUL PUSHD "%~1" POPD & GOTO :MENU ) ELSE ( GOTO :MSG )
@@ -69,7 +67,7 @@ ECHO  :                                                                         
 ECHO  :          Simple Shredder is a batch script that uses SDelete v2.0 either 32-bit or        :
 ECHO  :          64-bit depending on your system. SDelete is (C) Mark Russinovich.                :
 ECHO  :                                                                                           :
-ECHO  :          Copyright (c) 2017 the-j0k3r <th3-j0ker at protonmail dot com>                   :
+ECHO  :          Copyright (C) 2017 the-j0k3r ^<th3-j0ker at protonmail dot com^>                   :
 ECHO  :                                                                                           :
 ECHO  :          This program is FREE software. You can redistribute it and/or                    :
 ECHO  :          modify it under the terms of the GNU General Public License                      :
@@ -89,7 +87,7 @@ ECHO  +-------------------------------------------------------------------------
 ECHO.
 ECHO %Sprompt%: INFO: Drop Files / Folders to be deleted onto the %Self% Icon.
 ECHO %Sprompt%: PRESS ANY KEY TO EXIT.
-PAUSE >NUL.
+PAUSE >NUL
 GOTO :EXIT
 
 :HELP
@@ -99,7 +97,7 @@ CALL :HEADER
 ECHO.
 ECHO  +--------------------------------------+ HELP AND FAQ +-------------------------------------+
 ECHO  :                                                                                           :
-ECHO  :  1) When dropping a mix* of folders or folders + files at same time only only the main**  :
+ECHO  :  1) When dropping a mix* of folders or folders + files at same time only the main**       :
 ECHO  :     file or folder contents will be listed in detail. If you want to review the listing   :
 ECHO  :     for a large directory containing other folders and files that you drop them alone.    :
 ECHO  :                                                                                           :
@@ -142,20 +140,22 @@ ECHO  :                                   [4] 5 Secure DoD Passes               
 ECHO  :                                   [5] 6 Secure DoD Passes                                 :
 ECHO  :                                   [6] x Custom DoD Passes                                 :
 ECHO  :                                                                                           :
-ECHO  :                                   [7] Help and FAQ                                        :
-ECHO  :                                   [8] EXIT                                                :
+ECHO  :                                   [7] Drop to CMD Line                                    :
+ECHO  :                                   [8] Help and FAQ                                        :
+ECHO  :                                   [9] EXIT                                                :
 ECHO  :                                                                                           :
 ECHO  +-------------------------------------------------------------------------------------------+
 ECHO.
-CHOICE /C 12345678 /M "%Sprompt1%: Select the your desired option above: "
+CHOICE /C 123456789 /M "%Sprompt1%: Select the your desired option above: "
 IF %ERRORLEVEL%==1 SET Passes=2
 IF %ERRORLEVEL%==2 SET Passes=3
 IF %ERRORLEVEL%==3 SET Passes=4
 IF %ERRORLEVEL%==4 SET Passes=5
 IF %ERRORLEVEL%==5 SET Passes=6
 IF %ERRORLEVEL%==6 GOTO :CUSTOM
-IF %ERRORLEVEL%==7 GOTO :HELP
-IF %ERRORLEVEL%==8 GOTO :EXIT
+IF %ERRORLEVEL%==7 GOTO :CMDL
+IF %ERRORLEVEL%==8 GOTO :HELP
+IF %ERRORLEVEL%==9 GOTO :EXIT
 :CONTINUE
 ECHO %Sprompt%: INFO: %Passes% passes are set to securely delete the items queued.
 ECHO %Sprompt%: INFO: %Self% has loaded SDelete %OS_ARCH%.
@@ -170,12 +170,11 @@ REM Because of this batch limitation only the selected and first dropped item is
 REM Look into loading items dynamically by browsing for them and queuing them instead.
 ECHO  +-----------------------+ BEGIN LISTING ITEMS QUEUED FOR DELETION +-------------------------+
 ECHO.
-:: List Empty directories too.
+REM List Empty directories too
 FOR /D /R %1 %%A in (.) DO (
   DIR /a /b "%%~fA" 2>NUL | FINDSTR "^" >NUL || ECHO %Sprompt%: %%~fA
 )
-:: Recursive directory listing of contents.
-:: Also handle dropped files listing.
+REM Recursive directory listing of contents
 FOR /F "tokens=1,2 delims=d" %%b IN ("-%~a1") DO IF "%%c" NEQ "" (
 		FOR /R "%~f1" %%d IN (*) DO (
 			ECHO %Sprompt%: %%d
@@ -196,12 +195,12 @@ GOTO :WDELQ
 REM Because we cant reliably detect SDelete error level, its advised to review SDelete output.
 IF "%OS_ARCH%" == "64-bit" (
 	FOR %%c IN (%arg%) DO (
-		%SDelete% -p %Passes% -s "%%~fc"
+		%SDelete% -p %Passes% -r -s "%%~fc"
 	)
 ) ELSE (
 	IF "%OS_ARCH%" == "32-bit" (
 		FOR %%c IN (%arg%) DO (
-			%SDelete% -p %Passes% -s "%%~fc"
+			%SDelete% -p %Passes% -r -s "%%~fc"
 		)
 	)
 )
@@ -263,9 +262,15 @@ ECHO %Sprompt%: PRESS ANY KEY TO EXIT.
 PAUSE >NUL
 CALL :EXIT
 
+:CMDL
+CLS
+CALL :HEADER
+%COMSPEC% /C %SDelete%
+%COMSPEC% /K PROMPT !Self! $g
+
 :EXITH
 SET KthX=%Sprompt%: Thank you for using %Self% :)
-SET ExiT=%Sprompt%: Will now exit
+SET ExiT=%Sprompt%: Bye!
 CLS
 CALL :HEADER
 ECHO.
