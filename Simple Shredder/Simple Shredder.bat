@@ -1,5 +1,5 @@
 @ECHO OFF
-REM UNCOMMENT FOR DEBUG
+REM UNCOMMENT BELOW FOR DEBUG
 ::IF NOT DEFINED in_subprocess (CMD /K SET in_subprocess=y ^& %0 %*) & EXIT )
 SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 SET Parent=%~dp0
@@ -7,10 +7,13 @@ SET Self=%~n0
 SET Sprompt=%Self% ^$
 SET Sprompt1=%Self% $
 SET SDsource=https://live.sysinternals.com/Files/SDelete.zip
-SET Ver=v1.79
+SET Ver=v1.84
 REM Add title and set size ;)
 TITLE %Self%
-MODE CON: COLS=95 LINES=35
+MODE CON: COLS=97 LINES=35
+REM Set buffer size to 9999 this enables scrolling
+REM We use powershell here sadly batch is limited this way.
+powershell.exe -command "& {$pshost = Get-Host;$pswindow = $pshost.UI.RawUI;$newsize = $pswindow.BufferSize;$newsize.height = 9999;$pswindow.buffersize = $newsize;}"
 
 CD /D "%Parent%"
 
@@ -107,19 +110,25 @@ ECHO  :                                                                         
 ECHO  :  2) Listing of items dropped only happens after selection the number of passes and in     :
 ECHO  :     accordance to limitation #1.                                                          :
 ECHO  :                                                                                           :
-ECHO  :  3) You must drag & drop files or folders onto Shredder Icon to be processed, if not      :
+ECHO  :  3) You must drag and drop files or folders onto Shredder Icon to be processed, if not    :
 ECHO  :     there is no way to determine if items were dropped after you clicked the Shredder     :
 ECHO  :     Icon, so only the licence is shown.                                                   :
+ECHO  :                                                                                           :
+ECHO  :  BUG 1: Recursive deleting fails on some items with error "The directory is not empty."   :
+ECHO  :  when parent folder contains spaces in name e.g. "Folder name - copy".                    :
+ECHO  :  For time being remove parent folder name spaces.                                         :
+ECHO  :                                                                                           :
+ECHO  :  BUG 2: Script fails to open when parent folder has name such has e.g. name(1).           :
+ECHO  :  For time being rename parent folder to a unique simple name before operation.            :
 ECHO  :                                                                                           :
 ECHO  +-------------------------------------------------------------------------------------------+
 ECHO.
 
 :RTMMQ
 ECHO %Sprompt%: PRESS "N" KEY TO EXIT.
-SET /P RtMM="%Sprompt1%: Return to Main Menu [Y/N]? "
-IF /I "%RtMM%" EQU "Y" GOTO :MENU
-IF /I "%RtMM%" EQU "N" GOTO :EXIT
-ECHO %Sprompt1%: ERROR: Not a valid option. Valid options are [Y/N], try again^^!
+CHOICE /M "%Sprompt1%: Return to Main Menu"
+IF %ERRORLEVEL%==1 GOTO :MENU
+IF %ERRORLEVEL%==2 GOTO :EXIT
 GOTO :RTMMQ
 
 :MENU
@@ -165,24 +174,29 @@ ECHO.
 SET "arg=%*"
 SET "arg=%arg:)=^)%"
 SET "arg=%arg:(=^(%"
-REM We cant reliably list in detail e.g multiple directories via drag and drop.
+REM We cant reliably list in detail e.g. multiple directories via a single drag and drop operation.
 REM Because of this batch limitation only the selected and first dropped item is listed in detail.
 REM Look into loading items dynamically by browsing for them and queuing them instead.
 ECHO  +-----------------------+ BEGIN LISTING ITEMS QUEUED FOR DELETION +-------------------------+
 ECHO.
 REM List Empty directories too
-FOR /D /R %1 %%A in (.) DO (
-  DIR /a /b "%%~fA" 2>NUL | FINDSTR "^" >NUL || ECHO %Sprompt%: %%~fA
+FOR /D /R %1 %%A IN (%arg%) DO (
+	DIR /a /b "%%~fA" 2>NUL | FINDSTR "^" >NUL || ECHO %Sprompt%: %%~fA
+		COMPACT /U %%~fA 1>nul 2>nul
 )
 REM Recursive directory listing of contents
+REM SDelete does not support NTFS compressed items
+REM Silently decompress them (COMPACT /U *) to allow shred operation.
 FOR /F "tokens=1,2 delims=d" %%b IN ("-%~a1") DO IF "%%c" NEQ "" (
-		FOR /R "%~f1" %%d IN (*) DO (
-			ECHO %Sprompt%: %%d
-		)
+	FOR /R "%~f1" %%d IN (*) DO (
+		ECHO %Sprompt%: %%d
+		COMPACT /U %%d 1>NUL 2>NUL
+	)
 ) ELSE (
 	IF "%%c" NEQ "-" (
 		FOR %%d IN (%arg%) DO (
 			ECHO %Sprompt%: %%~fd
+			COMPACT /U %%d 1>NUL 2>NUL
 		)
 	)
 )
@@ -192,28 +206,30 @@ ECHO.
 GOTO :WDELQ
 
 :SDELETE
+ECHO.
 REM Because we cant reliably detect SDelete error level, its advised to review SDelete output.
 IF "%OS_ARCH%" == "64-bit" (
 	FOR %%c IN (%arg%) DO (
-		%SDelete% -p %Passes% -r -s "%%~fc"
+		%SDelete% -nobanner -p %Passes% -r -s "%%~fc"
 	)
 ) ELSE (
 	IF "%OS_ARCH%" == "32-bit" (
 		FOR %%c IN (%arg%) DO (
-			%SDelete% -p %Passes% -r -s "%%~fc"
+			%SDelete% -nobanner -p %Passes% -r -s "%%~fc"
 		)
 	)
 )
-::ECHO.
+ECHO.
 ECHO %Sprompt%: TIP: Scroll up to review process output log.
 PING 1.1.1.1 -n 1 -w 80 >NUL
-ECHO %Sprompt%: PRESS ANY KEY TO EXIT.
-PAUSE >NUL
-GOTO :EXIT
+ECHO %Sprompt%: PRESS "N" KEY TO EXIT.
+CHOICE /M "%Sprompt1%: Return to Main Menu"
+IF %ERRORLEVEL%==1 GOTO :MENU
+IF %ERRORLEVEL%==2 GOTO :EXIT
 
 :WDELQ
 VER > NUL
-CHOICE /C YN /M "%Sprompt1%: Would you like to proceed and permanently delete all items listed: "
+CHOICE /M "%Sprompt1%: Would you like to permanently delete all items listed:"
 IF %ERRORLEVEL%==1 GOTO :SDELETE
 IF %ERRORLEVEL%==2 GOTO :MENU
 GOTO :WDELQ
@@ -239,13 +255,12 @@ PING 1.0.0.0 -n 1 -w 100 >NUL
 EXIT
 
 :CUSTOM
-SET "CustomLenQ="""
-SET /P CustomLenQ="%Sprompt%: Enter your custom DoD pass length: "
+SET "CustomLenQ="
+SET /P CustomLenQ="%Sprompt%: Enter a custom DoD pass length: "
 SET /A EvalCLen=CustomLenQ
 IF %EvalCLen% EQU %CustomLenQ% (
 	IF %CustomLenQ% GTR 99 ( GOTO :INVALID )
 	IF %CustomLenQ% GTR 6 ( SET "Passes=%CustomLenQ%" & GOTO :CONTINUE )
-	IF %CustomLenQ% LSS 5 ( GOTO :INVALID )
 ) ELSE ( GOTO :INVALID )
 
 :INVALID
