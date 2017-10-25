@@ -1,0 +1,33 @@
+
+ +-------------------------------------+ HELP AND FAQ +--------------------------------------+
+ :                                                                                           :
+ :  1) When dropping a mix* of folders or folders + files at same time only the main**       :
+ :     file or folder contents will be listed in detail. If you want to review the listing   :
+ :     for a large directory containing other folders and files that you drop them alone.    :
+ :                                                                                           :
+ :  *  All mixed items will be deleted irrespectively if they are listed in detail or not.   :
+ :  ** The main file or folder in the group is the one you select and drop into the Icon.    :
+ :                                                                                           :
+ :  2) Listing of items dropped only happens after selection the number of passes and in     :
+ :     accordance to limitation #1.                                                          :
+ :                                                                                           :
+ :  3) You must drag and drop files or folders onto Shredder Icon to be processed, if not    :
+ :     there is no way to determine if items were dropped after you clicked the Shredder     :
+ :     Icon, so only the licence is shown.                                                   :
+ :                                                                                           :
+ :--------------------------------------+ KNOWN BUGS +---------------------------------------:
+ :                                                                                           :
+ :  BUG 1: Recursive deleting fails on some items with error "The directory is not empty."   :
+ :  when parent folder contains spaces in name e.g. "Folder name - copy".                    :
+ :  For time being remove parent folder name spaces to facilitate operation.                 :
+ :                                                                                           :
+ :  BUG 2: Script fails to open when parent folder has name such has e.g. name(1).           :
+ :  For time being, please rename parent folder to a unique name before operation.           :
+ :                                                                                           :
+ :  BUG 3: Script only lists dropped empty folders when dropped over the batch directly.     :
+ :  For time being, please rename parent folder to a unique simple name before operation.    :
+ :                                                                                           :
+ :  BUG 4: Script fails to shred files with spaces in names if they multiple dirs deep.      :
+ :  For time being, these can be processed by dropping them directly from their end path.    :
+ :                                                                                           :
+ +-------------------------------------------------------------------------------------------+

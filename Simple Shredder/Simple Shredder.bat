@@ -7,7 +7,7 @@ SET Self=%~n0
 SET Sprompt=%Self% ^$
 SET Sprompt1=%Self% $
 SET SDsource=https://live.sysinternals.com/Files/SDelete.zip
-SET Ver=v1.84
+SET Ver=v1.87
 REM Add title and set size ;)
 TITLE %Self%
 MODE CON: COLS=97 LINES=35
@@ -64,6 +64,7 @@ ECHO  +-------------------------------------------------------------------------
 GOTO :EOF
 
 :MSG
+MODE CON: COLS=95 LINES=31
 COLOR E
 CALL :HEADER
 ECHO  :                                                                                           :
@@ -88,41 +89,19 @@ ECHO  :          Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, U
 ECHO  :                                                                                           :
 ECHO  +-------------------------------------------------------------------------------------------+
 ECHO.
-ECHO %Sprompt%: INFO: Drop Files / Folders to be deleted onto the %Self% Icon.
-ECHO %Sprompt%: PRESS ANY KEY TO EXIT.
-PAUSE >NUL
-GOTO :EXIT
+ECHO %Sprompt%: INFO: Drop Files / Folders to be shredded onto the %Self% Icon.
+ECHO.
+ECHO %Sprompt%: PRESS "N" KEY TO EXIT.
+CHOICE /M "%Sprompt1%: Display HELP AND FAQ"
+IF %ERRORLEVEL%==1 CALL :HELPB
+IF %ERRORLEVEL%==2 GOTO :EXIT
 
 :HELP
 CLS
+MODE CON: COLS=95 LINES=40
 COLOR 1F
 CALL :HEADER
-ECHO.
-ECHO  +--------------------------------------+ HELP AND FAQ +-------------------------------------+
-ECHO  :                                                                                           :
-ECHO  :  1) When dropping a mix* of folders or folders + files at same time only the main**       :
-ECHO  :     file or folder contents will be listed in detail. If you want to review the listing   :
-ECHO  :     for a large directory containing other folders and files that you drop them alone.    :
-ECHO  :                                                                                           :
-ECHO  :  *  All mixed items will be deleted irrespectively if they are listed in detail or not.   :
-ECHO  :  ** The main file or folder in the group is the one you select and drop into the Icon.    :
-ECHO  :                                                                                           :
-ECHO  :  2) Listing of items dropped only happens after selection the number of passes and in     :
-ECHO  :     accordance to limitation #1.                                                          :
-ECHO  :                                                                                           :
-ECHO  :  3) You must drag and drop files or folders onto Shredder Icon to be processed, if not    :
-ECHO  :     there is no way to determine if items were dropped after you clicked the Shredder     :
-ECHO  :     Icon, so only the licence is shown.                                                   :
-ECHO  :                                                                                           :
-ECHO  :  BUG 1: Recursive deleting fails on some items with error "The directory is not empty."   :
-ECHO  :  when parent folder contains spaces in name e.g. "Folder name - copy".                    :
-ECHO  :  For time being remove parent folder name spaces.                                         :
-ECHO  :                                                                                           :
-ECHO  :  BUG 2: Script fails to open when parent folder has name such has e.g. name(1).           :
-ECHO  :  For time being rename parent folder to a unique simple name before operation.            :
-ECHO  :                                                                                           :
-ECHO  +-------------------------------------------------------------------------------------------+
-ECHO.
+TYPE HELP_AND_FAQ
 
 :RTMMQ
 ECHO %Sprompt%: PRESS "N" KEY TO EXIT.
@@ -132,6 +111,7 @@ IF %ERRORLEVEL%==2 GOTO :EXIT
 GOTO :RTMMQ
 
 :MENU
+MODE CON: COLS=97 LINES=35
 CLS
 VER > NUL
 CALL :HEADER
@@ -179,14 +159,20 @@ REM Because of this batch limitation only the selected and first dropped item is
 REM Look into loading items dynamically by browsing for them and queuing them instead.
 ECHO  +-----------------------+ BEGIN LISTING ITEMS QUEUED FOR DELETION +-------------------------+
 ECHO.
-REM List Empty directories too
-FOR /D /R %1 %%A IN (%arg%) DO (
-	DIR /a /b "%%~fA" 2>NUL | FINDSTR "^" >NUL || ECHO %Sprompt%: %%~fA
-		COMPACT /U %%~fA 1>nul 2>nul
+REM List empty directories too
+REM Unfortunately doesn't list empty directories, if they are dropped over
+REM any existing Simple Shredder shortcut, despite this these are shredded anyway.
+
+FOR /D /R %%d IN (*) DO (
+	DIR /B /S /A-D "%%d" >NUL 2>&1|| ECHO %Sprompt%: %%d
+	COMPACT /U %%~fd 1>NUL 2>NUL
 )
-REM Recursive directory listing of contents
-REM SDelete does not support NTFS compressed items
-REM Silently decompress them (COMPACT /U *) to allow shred operation.
+
+REM COMPACT: SDelete does not support NTFS compressed items and fails to shred them.
+REM Decompress them and hide unrelated output (COMPACT /U *) to allow shred operation.
+
+REM Support recursive directory listing of contents.
+REM Without this recursive directory and content listing doesn't work as desired.
 FOR /F "tokens=1,2 delims=d" %%b IN ("-%~a1") DO IF "%%c" NEQ "" (
 	FOR /R "%~f1" %%d IN (*) DO (
 		ECHO %Sprompt%: %%d
@@ -207,18 +193,12 @@ GOTO :WDELQ
 
 :SDELETE
 ECHO.
-REM Because we cant reliably detect SDelete error level, its advised to review SDelete output.
-IF "%OS_ARCH%" == "64-bit" (
-	FOR %%c IN (%arg%) DO (
-		%SDelete% -nobanner -p %Passes% -r -s "%%~fc"
-	)
-) ELSE (
-	IF "%OS_ARCH%" == "32-bit" (
-		FOR %%c IN (%arg%) DO (
-			%SDelete% -nobanner -p %Passes% -r -s "%%~fc"
-		)
-	)
+REM Because we cant reliably detect SDelete's error level, its advised to review SDelete output.
+REM The HELP and FAQ section holds the current issues unable to be resolved at this time.
+FOR %%c IN (%arg%) DO (
+	%SDelete% -nobanner -p %Passes% -r -s "%%~fc"
 )
+
 ECHO.
 ECHO %Sprompt%: TIP: Scroll up to review process output log.
 PING 1.1.1.1 -n 1 -w 80 >NUL
@@ -283,7 +263,19 @@ CALL :HEADER
 %COMSPEC% /C %SDelete%
 %COMSPEC% /K PROMPT !Self! $g
 
+:HELPB
+CLS
+MODE CON: COLS=95 LINES=40
+COLOR 1F
+CALL :HEADER
+TYPE HELP_AND_FAQ
+ECHO %Sprompt%: INFO: Drop Files / Folders to be deleted onto the %Self% Icon.
+ECHO %Sprompt%: PRESS ANY KEY TO EXIT.
+PAUSE >NUL
+GOTO :EXIT
+
 :EXITH
+MODE CON: COLS=95 LINES=31
 SET KthX=%Sprompt%: Thank you for using %Self% :)
 SET ExiT=%Sprompt%: Bye!
 CLS
