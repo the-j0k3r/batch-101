@@ -11,9 +11,6 @@ SET Ver=v1.87
 REM Add title and set size ;)
 TITLE %Self%
 MODE CON: COLS=97 LINES=35
-REM Set buffer size to 9999 this enables scrolling
-REM We use powershell here sadly batch is limited this way.
-powershell.exe -command "& {$pshost = Get-Host;$pswindow = $pshost.UI.RawUI;$newsize = $pswindow.BufferSize;$newsize.height = 9999;$pswindow.buffersize = $newsize;}"
 
 CD /D "%Parent%"
 
@@ -151,14 +148,18 @@ ECHO %Sprompt%: INFO: %Self% has loaded SDelete %OS_ARCH%.
 ECHO.
 
 :LIST
+REM Set buffer size to 9999 this enables scrolling
+REM We use powershell here sadly batch is limited this way.
+powershell.exe -command "& {$pshost = Get-Host;$pswindow = $pshost.UI.RawUI;$newsize = $pswindow.BufferSize;$newsize.height = 9999;$pswindow.buffersize = $newsize;}"
 SET "arg=%*"
 SET "arg=%arg:)=^)%"
 SET "arg=%arg:(=^(%"
+ECHO  +-----------------------+ BEGIN LISTING ITEMS QUEUED FOR DELETION +-------------------------+
+ECHO.
+
 REM We cant reliably list in detail e.g. multiple directories via a single drag and drop operation.
 REM Because of this batch limitation only the selected and first dropped item is listed in detail.
 REM Look into loading items dynamically by browsing for them and queuing them instead.
-ECHO  +-----------------------+ BEGIN LISTING ITEMS QUEUED FOR DELETION +-------------------------+
-ECHO.
 REM List empty directories too
 REM Unfortunately doesn't list empty directories, if they are dropped over
 REM any existing Simple Shredder shortcut, despite this these are shredded anyway.
@@ -192,9 +193,9 @@ ECHO.
 GOTO :WDELQ
 
 :SDELETE
-ECHO.
 REM Because we cant reliably detect SDelete's error level, its advised to review SDelete output.
 REM The HELP and FAQ section holds the current issues unable to be resolved at this time.
+ECHO.
 FOR %%c IN (%arg%) DO (
 	%SDelete% -nobanner -p %Passes% -r -s "%%~fc"
 )
