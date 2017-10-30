@@ -1,8 +1,12 @@
 @ECHO OFF
-TITLE Simple Password Generator
+SET Self=%~n0
+REM UNCOMMENT BELOW FOR DEBUG
+::IF NOT DEFINED in_subprocess (CMD /K SET in_subprocess=y ^& %0 %*) & EXIT )
+REM Set title, size, prompt and version ;)
+TITLE %Self%
 MODE CON: COLS=95 LINES=30
 SET SPGprompt=SPG ^$
-SET Ver=v1.99
+SET Ver=v2.01
 
 :MAIN
 COLOR 1F
@@ -14,10 +18,10 @@ SET RNDLength=0
 ECHO  +----------------------------------------+ MAIN MENU +--------------------------------------+
 ECHO  :                                                                                           :
 ECHO  :                                [1] 10 Random Characters Long                              :
-ECHO  :                                [2] 15 Random Characters Long                              :
-ECHO  :                                [3] 20 Random Characters Long                              :
-ECHO  :                                [4] 25 Random Characters Long                              :
-ECHO  :                                [5] 30 Random Characters Long                              :
+ECHO  :                                [2] 20 Random Characters Long                              :
+ECHO  :                                [3] 30 Random Characters Long                              :
+ECHO  :                                [4] 40 Random Characters Long                              :
+ECHO  :                                [5] 50 Random Characters Long                              :
 ECHO  :                                [6] Custom Random Length                                   :
 ECHO  :                                                                                           :
 ECHO  :                                [7] ABOUT                                                  :
@@ -25,20 +29,20 @@ ECHO  :                                [8] EXIT                                 
 ECHO  :                                                                                           :
 ECHO  +-------------------------------------------------------------------------------------------+
 ECHO.
-CHOICE /C 12345678 /M "SPG $: Choose a password lenght: "
+CHOICE /C 12345678 /M "%SPGprompt%: Make your selection:"
 IF %ERRORLEVEL%==1 SET RNDLength=10
-IF %ERRORLEVEL%==2 SET RNDLength=15
-IF %ERRORLEVEL%==3 SET RNDLength=20
-IF %ERRORLEVEL%==4 SET RNDLength=25
-IF %ERRORLEVEL%==5 SET RNDLength=30
+IF %ERRORLEVEL%==2 SET RNDLength=20
+IF %ERRORLEVEL%==3 SET RNDLength=30
+IF %ERRORLEVEL%==4 SET RNDLength=40
+IF %ERRORLEVEL%==5 SET RNDLength=50
 IF %ERRORLEVEL%==6 GOTO :CUSTOM
 IF %ERRORLEVEL%==7 GOTO :ABOUT
 IF %ERRORLEVEL%==8 GOTO :EXIT
 
 :PGEN
-:: The random character engine was provided by TheOucaste.
-:: Some modifications were made to suit the Simple Password Generator.
-:: A thank you to TheOutcaste for the code snippet.
+REM The random character engine was provided by TheOucaste.
+REM Some modifications were made to suit the Simple Password Generator.
+REM A thank you to TheOutcaste for the code snippet.
 SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 SET Alphanumeric=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&)(-_=+][}{\|'";:/?.,
 SET Str=%Alphanumeric%9876543210
@@ -56,6 +60,7 @@ SET RNDAlphaNum=!RNDAlphaNum!!Alphanumeric:~%RND%,1!
 IF !count! lss %RNDLength% GOTO :LOOP
 SET "PassWord="
 ECHO !RNDAlphaNum!| CLIP
+ECHO %SPGprompt%: INFO: You selected a password %RNDLength% characters long.
 ECHO %SPGprompt%: INFO: Copied !RNDAlphaNum! to the clipboard^^!
 ECHO  +-------------------------------------------------------------------------------------------+
 ECHO  :          WARNING: THE CLIPBOARD WILL BE CLEARED ON PASSWORD REGENERATION OR EXIT.         :
@@ -64,26 +69,14 @@ SET PassWord=!RNDAlphaNum!
 ENDLOCAL && SET PassWord=%PassWord%
 
 :QUERYSAVEPASS
-SET "SavePassQ="
-SET /P SavePassQ="SPG $: Would you like to save the password to file [Y/N]? "
-IF /I "%SavePassQ%" EQU "Y" GOTO :SAVEPASSNAME
-IF /I "%SavePassQ%" EQU "N" GOTO :REGEN
-IF /I "%SavePassQ%"=="%SavePassQ%" GOTO :HANDLEQUERYSAVEPASS
-
-:HANDLEQUERYSAVEPASS
-ECHO %SPGprompt%: ERROR: Not a valid option. Valid options are [Y/N], try again^!
-GOTO :QUERYSAVEPASS
+CHOICE /M "%SPGprompt%: Would you like to save the password to file"
+IF %ERRORLEVEL%==1 CALL :SAVEPASSNAME
+IF %ERRORLEVEL%==2 GOTO :REGEN
 
 :REGEN
-SET "GenNewQ="
-SET /P GenNewQ="SPG $: Would you like to generate a new password [Y/N]? "
-IF /I "%GenNewQ%" EQU "Y" ECHO OFF | CLIP && CLS && GOTO :MAIN
-IF /I "%GenNewQ%" EQU "N" GOTO :EXIT
-IF /I "%GenNewQ%"=="%GenNewQ%" GOTO :INFO1
-
-:INFO1
-ECHO %SPGprompt%: ERROR: Not a valid option. Valid options are [Y/N], try again^!
-GOTO :REGEN
+CHOICE /M "%SPGprompt%: Would you like to generate a new password"
+IF %ERRORLEVEL%==1 ECHO OFF | CLIP && CLS && GOTO :MAIN
+IF %ERRORLEVEL%==2 GOTO :EXIT
 
 :ABOUT
 COLOR E
@@ -94,8 +87,8 @@ ECHO  :            The original random char generator (:PGEN) was provided by Th
 ECHO  :            The Simple Password Generator is a batch script that builds upon that          :
 ECHO  :            to generate user selectable lengths passwords and save them to file.           :
 ECHO  :                                                                                           :
-ECHO  :            Copyright (C) 2017 the-j0k3r <th3-j0ker at protonmail dot com>                 :
-ECHO  :            Copyright :PGEN (C) 2009 <http://tinyurl.com/TheOutcaste>                      :
+ECHO  :            Copyright (C) 2017 the-j0k3r ^<th3-j0ker at protonmail dot com^>                 :
+ECHO  :            Copyright :PGEN (C) 2009 ^<http://tinyurl.com/TheOutcaste^>                      :
 ECHO  :                                                                                           :
 ECHO  :            This program is FREE software. You can redistribute it and/or                  :
 ECHO  :            modify it under the terms of the GNU General Public License                    :
@@ -115,16 +108,9 @@ ECHO  +-------------------------------------------------------------------------
 ECHO.
 
 :QUERY
-SET Return2MMQ=
-SET /P Return2MMQ="SPG $: Return to Main Menu [Y/N]? "
-IF /I "%Return2MMQ%" EQU "Y" CLS && GOTO :MAIN
-IF /I "%Return2MMQ%" EQU "N" GOTO :EXIT
-IF /I "%Return2MMQ%"=="%Return2MMQ%" GOTO :INFO2
-GOTO :ABOUT
-
-:INFO2
-ECHO %SPGprompt%: ERROR: Not a valid option. Valid options are [Y/N], try again^!
-GOTO :QUERY
+CHOICE /M "%SPGprompt%: Return to Main Menu"
+IF %ERRORLEVEL%==1 CLS && GOTO :MAIN
+IF %ERRORLEVEL%==2 GOTO :EXIT
 
 :EXIT
 ECHO OFF | CLIP
@@ -184,39 +170,36 @@ GOTO :SAVEPASSNAME
 
 :PROCESSTOFILE
 SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
-SET fileName=Simple-Password-Generator-List.txt
+SET FileName=Simple-Password-Generator-List.txt
 IF EXIST %FileName% (
 	ECHO SPG $: INFO: %FileName% exists, appending data to file.
-	ECHO. >>%FileName%
-	ECHO Reference: %Reference% >>%FileName%
-	ECHO. >>%FileName%
-	ECHO Password: %PassWord% >>%FileName%
-	ECHO. >>%FileName%
+	ECHO.>>%FileName%
+	ECHO Reference: %Reference%>>%FileName%
+	ECHO.>>%FileName%
+	ECHO Password: %PassWord%>>%FileName%
+	ECHO.>>%FileName%
 	CALL :TIMESTAMP
-	ECHO. >>%FileName%
-	ECHO  +-------+ SAVED SECURE PASSWORD LIST +--------------------------------------+ SPG %Ver% +---+ >>%FileName%
+	ECHO.>>%FileName%
+	ECHO  +-------+ SAVED SECURE PASSWORD LIST +--------------------------------------+ SPG %Ver% +---+>>%FileName%
 ) ELSE (
 	ECHO SPG $: INFO: %FileName% Not found, generating new file.
-	ECHO. >>%FileName%
-	CALL :HEADER >>%FileName%
-	ECHO. >>%FileName%
-	ECHO Reference: %Reference% >>%FileName%
-	ECHO. >>%FileName%
-	ECHO Password: %PassWord% >>%FileName%
-	ECHO. >>%FileName%
+	CALL :HEADER >%FileName%
+	ECHO.>>%FileName%
+	ECHO Reference: %Reference%>>%FileName%
+	ECHO.>>%FileName%
+	ECHO Password: %PassWord%>>%FileName%
+	ECHO.>>%FileName%
 	CALL :TIMESTAMP
-	ECHO. >>%FileName%
-	ECHO  +-------+ SAVED SECURE PASSWORD LIST +--------------------------------------+ SPG %Ver% +---+ >>%FileName%
+	ECHO.>>%FileName%
+	ECHO  +-------+ SAVED SECURE PASSWORD LIST +--------------------------------------+ SPG %Ver% +---+>>%FileName%
 )
 ECHO SPG $: INFO: Your password and reference have been saved to %FileName%.
 ECHO SPG $:  TIP: Keep this file safe in a secure external drive.
 GOTO :REGEN
 
 :TIMESTAMP
-SET Date=Date: %date:~-10,2%^/%date:~-7,2%^/%date:~-4,4%
-SET Time=Time 24-h: %time:~-11,2%:%time:~-8,2%:%time:~-5,2%:%time:~-2,2%
-SET TimeStamp=%Date% - %Time%
-ECHO Date and Time Generated: %TimeStamp% >>%FileName%
+SET TimeStamp=%DATE% -%TIME%
+ECHO Generated: %TimeStamp%>>%FileName%
 GOTO :EOF
 
 :HEADER
@@ -227,8 +210,8 @@ ECHO  +-------------------------------------------------------------------------
 GOTO :EOF
 
 :EXITH
-SET KthX=%SPGprompt%: Thank you for using Simple Password Generator :)
-SET ExiT=%SPGprompt%: Will now exit
+SET KthX=%SPGprompt%: Thank you for using %Self% :)
+SET ExiT=%SPGprompt%: Bye
 CLS
 CALL :HEADER
 ECHO.
