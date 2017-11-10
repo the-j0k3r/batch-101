@@ -7,7 +7,7 @@ SET Self=%~n0
 SET Sprompt=%Self% ^$
 SET Sprompt1=%Self% $
 SET SDsource=https://live.sysinternals.com/Files/SDelete.zip
-SET Ver=v1.87
+SET Ver=v1.89
 REM Add title and set size ;)
 TITLE %Self%
 MODE CON: COLS=97 LINES=35
@@ -120,28 +120,26 @@ SET "Passes="
 ECHO  +-----------------------------------------+ MAIN MENU +-------------------------------------+
 ECHO  :                                                                                           :
 ECHO  :                                   [1] 2 Secure DoD Passes                                 :
-ECHO  :                                   [2] 3 Secure DoD Passes                                 :
-ECHO  :                                   [3] 4 Secure DoD Passes                                 :
-ECHO  :                                   [4] 5 Secure DoD Passes                                 :
-ECHO  :                                   [5] 6 Secure DoD Passes                                 :
-ECHO  :                                   [6] x Custom DoD Passes                                 :
+ECHO  :                                   [2] 4 Secure DoD Passes                                 :
+ECHO  :                                   [3] 6 Secure DoD Passes                                 :
+ECHO  :                                   [4] 8 Secure DoD Passes                                 :
+ECHO  :                                   [5] x Custom DoD Passes                                 :
 ECHO  :                                                                                           :
-ECHO  :                                   [7] Drop to CMD Line                                    :
-ECHO  :                                   [8] Help and FAQ                                        :
-ECHO  :                                   [9] EXIT                                                :
+ECHO  :                                   [6] Drop to CMD Line                                    :
+ECHO  :                                   [7] Help and FAQ                                        :
+ECHO  :                                   [8] EXIT                                                :
 ECHO  :                                                                                           :
 ECHO  +-------------------------------------------------------------------------------------------+
 ECHO.
-CHOICE /C 123456789 /M "%Sprompt1%: Select the your desired option above: "
+CHOICE /C 12345678 /M "%Sprompt1%: Select the your desired option above: "
 IF %ERRORLEVEL%==1 SET Passes=2
-IF %ERRORLEVEL%==2 SET Passes=3
-IF %ERRORLEVEL%==3 SET Passes=4
-IF %ERRORLEVEL%==4 SET Passes=5
-IF %ERRORLEVEL%==5 SET Passes=6
-IF %ERRORLEVEL%==6 GOTO :CUSTOM
-IF %ERRORLEVEL%==7 GOTO :CMDL
-IF %ERRORLEVEL%==8 GOTO :HELP
-IF %ERRORLEVEL%==9 GOTO :EXIT
+IF %ERRORLEVEL%==2 SET Passes=4
+IF %ERRORLEVEL%==3 SET Passes=6
+IF %ERRORLEVEL%==4 SET Passes=8
+IF %ERRORLEVEL%==5 GOTO :CUSTOM
+IF %ERRORLEVEL%==6 GOTO :CMDL
+IF %ERRORLEVEL%==7 GOTO :HELP
+IF %ERRORLEVEL%==8 GOTO :EXIT
 :CONTINUE
 ECHO %Sprompt%: INFO: %Passes% passes are set to securely delete the items queued.
 ECHO %Sprompt%: INFO: %Self% has loaded SDelete %OS_ARCH%.
@@ -237,16 +235,18 @@ EXIT
 
 :CUSTOM
 SET "CustomLenQ="
+SET MinLen=10
+SET MaxLen=99
 SET /P CustomLenQ="%Sprompt%: Enter a custom DoD pass length: "
 SET /A EvalCLen=CustomLenQ
 IF %EvalCLen% EQU %CustomLenQ% (
-	IF %CustomLenQ% GTR 99 ( GOTO :INVALID )
-	IF %CustomLenQ% GTR 6 ( SET "Passes=%CustomLenQ%" & GOTO :CONTINUE )
+	IF %CustomLenQ% GTR %MaxLen% ( GOTO :INVALID )
+	IF %CustomLenQ% GTR %MinLen% ( SET "Passes=%CustomLenQ%" & GOTO :CONTINUE )
 ) ELSE ( GOTO :INVALID )
 
 :INVALID
 ECHO %Sprompt%: ERROR: Input is invalid.
-ECHO %Sprompt%: INFO : Enter a number greater than 6 and smaller than 100.
+ECHO %Sprompt%:  INFO: Enter a number greater than %MinLen% and smaller than 100.
 GOTO :CUSTOM
 
 :UNSUP
