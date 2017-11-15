@@ -235,7 +235,7 @@ EXIT
 
 :CUSTOM
 SET "CustomLenQ="
-SET MinLen=10
+SET MinLen=9
 SET MaxLen=99
 SET /P CustomLenQ="%Sprompt%: Enter a custom DoD pass length: "
 SET /A EvalCLen=CustomLenQ
