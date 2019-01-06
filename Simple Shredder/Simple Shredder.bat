@@ -131,7 +131,7 @@ ECHO  :                                   [8] EXIT                              
 ECHO  :                                                                                           :
 ECHO  +-------------------------------------------------------------------------------------------+
 ECHO.
-CHOICE /C 12345678 /M "%Sprompt1%: Select the your desired option above: "
+CHOICE /C 12345678 /M "%Sprompt1%: Select your desired option above: "
 IF %ERRORLEVEL%==1 SET Passes=2
 IF %ERRORLEVEL%==2 SET Passes=4
 IF %ERRORLEVEL%==3 SET Passes=6
