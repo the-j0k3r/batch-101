@@ -34,18 +34,28 @@ The Icon provided is a design by [Mateusz Dembek](https://dribbble.com/shots/582
 
 ## About - Simple Password Generator
 
-This small batch file, generates complex passwords from a preset range length of 10 to 30 characters long or from a custom user defined length.
+:warning: **Warning** The Simple Password Generator **empties your clipboard** on every password regeneration or when it exits.
 
-It allows you to save your password to a text file which is stored to wherever path the batch file is, along with a reference tied to the password for you to at any time access.
+This small batch file, generates complex passwords from a preset range length of 10 to 50 characters long or from a custom user defined length no more than 999 characters
+
+Your password are saved to a text file with an optional reference to make it easy to remember the associated device/account/wifi etc. to the corresponding password
+The *Simple-Password-Generator-List.txt* is created if it doesn't exist and if it exists all passwords are appended to it.
+The *Simple-Password-Generator-List.txt* is stored to wherever path/location the batch file is, along with a reference/date/time tied to the password for you to at any time access.
 
 If this path is a USB drive your passwords will be safe as long as you take simple precautions.
 
+I recommend you use an external storage device like USB for this purpose
+
+From version 2.02 Generated passwords are compliant with DD-WRT
+
 #### How Strong Are My Passwords
 
-You can find out how strong your passwords are [here](https://www.grc.com/haystack.htm)
+For curiosity find out how potentially strong your passwords are [here](https://www.grc.com/haystack.htm)
 
 ![Simple Password Generator](./screenshots/Simple-Password-Generator.PNG "Main Menu")
 
-:warning: **Warning** The Simple Password Generator **empties your clipboard** on every password regeneration or when it exits.
-
 [![Simple Password Generator GPLv2+](https://img.shields.io/badge/%20%20%20%20%20%20Simple_Password_Generator%20%20%20%20%20%20-%20GPLv2+%20-blue.svg)](LICENCE)
+
+## WARRANTY
+
+Read [the relevant part](https://github.com/the-j0k3r/batch-101/blob/8eace2781a028f888468bb0eef8c853f6864d493/LICENCE#L260-L278) of the License.
