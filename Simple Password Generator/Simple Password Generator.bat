@@ -6,7 +6,7 @@ REM Set title, size, prompt and version ;)
 TITLE %Self%
 MODE CON: COLS=95 LINES=30
 SET SPGprompt=SPG ^$
-SET Ver=v2.02
+SET Ver=v2.03
 
 :MAIN
 COLOR 1F
@@ -44,7 +44,7 @@ REM The random character engine was provided by TheOucaste.
 REM Some modifications were made to suit the Simple Password Generator.
 REM A thank you to TheOutcaste for the code snippet.
 SETLOCAL ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
-SET Alphanumeric=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&)(-_=+][}{\|;:/?.,
+SET Alphanumeric=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&)(-_=+][}{\;/?.,
 SET Str=%Alphanumeric%9876543210
 :LENGHTLOOP
 IF NOT "%Str:~18%"=="" SET Str=%Str:~9%& SET /A Len+=9& GOTO :LENGHTLOOP
